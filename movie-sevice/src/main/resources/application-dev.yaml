@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 0
+integration:
+  tmdb-api:
+    url: https://api.themoviedb.org/3
+    key: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxM2Y0MWUwNTdlNDg4MTljZjg3OWY3YzQ4YTNmYjQ1OSIsIm5iZiI6MTczMTg3MzMyOS43OTI4MjksInN1YiI6IjY2ZjgzMjA5NjIxZTg2MTZiNDVmM2VmYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.mlsLhOfl4X5E_JDn-Oy-OoyQcyEHMbC_zzbfr-QrWKs
+scheduled:
+  task:
+    update-db: "0 0 3 * * ?"
