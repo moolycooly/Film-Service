@@ -5,17 +5,21 @@ import lombok.*;
 
 import java.util.Set;
 
-@Entity
-@Table(name="movie")
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @Data
 @EqualsAndHashCode(exclude = "genres")
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name="movie")
 public class MovieEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
+
+    @Column(name ="tmdb_id")
+    private Integer tmdbId;
 
     @Column(name = "adult")
     private Boolean adult;

@@ -1,10 +1,12 @@
 CREATE TABLE IF NOT EXISTS genre (
     id BIGSERIAL PRIMARY KEY,
+    tmdb_id BIGSERIAL,
     name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS movie (
     id BIGSERIAL PRIMARY KEY,
+    tmdb_id BIGSERIAL,
     adult BOOLEAN,
     backdrop_path VARCHAR(500),
     original_language VARCHAR(50),
