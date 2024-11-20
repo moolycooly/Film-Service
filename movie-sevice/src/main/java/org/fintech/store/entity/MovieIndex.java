@@ -41,7 +41,10 @@ public class MovieIndex {
     @Field(type = FieldType.Text)
     private String overview;
 
-    @Field(type = FieldType.Double)
+    @Field(type = FieldType.Float)
+    private Double tmdbPopularity;
+
+    @Field(type = FieldType.Float)
     private Double popularity;
 
     @Field(type = FieldType.Text)
@@ -56,14 +59,20 @@ public class MovieIndex {
     @Field(type = FieldType.Boolean)
     private Boolean video;
 
-    @Field(type = FieldType.Double)
+    @Field(type = FieldType.Float)
     private Double voteAverage;
 
     @Field(type = FieldType.Integer)
     private Integer voteCount;
 
+    @Field(type = FieldType.Float)
+    private Double tmdbVoteAverage;
+
     @Field(type = FieldType.Integer)
-    private List<Integer> actorsId;
+    private Integer tmdbVoteCount;
+//
+//    @Field(type = FieldType.Integer)
+//    private List<Integer> actorsId;
 
 
 

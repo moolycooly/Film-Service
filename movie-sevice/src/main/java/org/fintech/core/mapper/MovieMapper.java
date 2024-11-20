@@ -37,11 +37,14 @@ public class MovieMapper {
                 .originalTitle(movie.getOriginalTitle())
                 .releaseDate(movie.getReleaseDate())
                 .overview(movie.getOverview())
-                .popularity(movie.getPopularity())
+                .tmdbPopularity(movie.getPopularity())
                 .posterPath(movie.getPosterPath())
-                .voteAverage(movie.getVoteAverage())
-                .voteCount(movie.getVoteCount())
+                .tmdbVoteAverage(movie.getVoteAverage())
+                .tmdbVoteCount(movie.getVoteCount())
                 .genreIds(movie.getGenreIds())
+                .voteAverage(0D)
+                .tmdbVoteCount(0)
+                .popularity(0D)
                 .build();
     }
 }

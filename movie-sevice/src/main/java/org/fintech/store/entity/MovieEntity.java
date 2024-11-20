@@ -36,6 +36,9 @@ public class MovieEntity {
     @Column(name = "overview")
     private String overview;
 
+    @Column(name = "tmdb_popularity")
+    private Double tmdbPopularity;
+
     @Column(name = "popularity")
     private Double popularity;
 
@@ -51,8 +54,14 @@ public class MovieEntity {
     @Column(name = "video")
     private Boolean video;
 
+    @Column(name = "tmdb_vote_average")
+    private Double tmdbVoteAverage;
+
     @Column(name = "vote_average")
     private Double voteAverage;
+
+    @Column(name = "tmdb_vote_count")
+    private Integer tmdbVoteCount;
 
     @Column(name = "vote_count")
     private Integer voteCount;

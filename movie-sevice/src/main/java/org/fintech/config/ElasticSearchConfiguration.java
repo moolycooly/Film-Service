@@ -9,7 +9,6 @@ import java.time.Duration;
 @Configuration
 public class ElasticSearchConfiguration extends ElasticsearchConfiguration {
 
-
     @Override
     public ClientConfiguration clientConfiguration() {
         return ClientConfiguration.builder()

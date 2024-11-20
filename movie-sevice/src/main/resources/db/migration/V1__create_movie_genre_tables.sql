@@ -13,12 +13,15 @@ CREATE TABLE IF NOT EXISTS movie (
     original_title VARCHAR(500),
     overview TEXT,
     popularity DOUBLE PRECISION,
+    tmdb_popularity DOUBLE PRECISION,
     poster_path VARCHAR(500),
     release_date VARCHAR(20),
     title VARCHAR(500),
     video BOOLEAN,
     vote_average DOUBLE PRECISION,
     vote_count INTEGER
+    tmdb_vote_average DOUBLE PRECISION,
+    tmdb_vote_count INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS movie_genre (

@@ -6,12 +6,12 @@ import co.elastic.clients.elasticsearch._types.FieldValue;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.json.JsonData;
-import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.core.Movie;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.fintech.api.exception.MovieNotFoundException;
 import org.fintech.api.model.FilterCondition;
 import org.fintech.core.mapper.MovieMapper;
 import org.fintech.store.entity.GenreEntity;
@@ -21,11 +21,9 @@ import org.fintech.store.repository.GenreRepository;
 import org.fintech.store.repository.MovieIndexRepository;
 import org.fintech.store.repository.MovieRepository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.fintech.store.specification.BaseSpecification;
+import org.springframework.data.domain.*;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -53,9 +51,27 @@ public class MovieService {
 
     private final ElasticsearchOperations elasticsearchOperations;
 
+    private final BaseSpecification<MovieEntity> baseSpecification;
+
     private final MovieMapper movieMapper;
 
-    public Page<MovieIndex> findMoviesByFilters(int page, int size, List<FilterCondition> filterConditions) {
+    public Page<MovieEntity> findMoviesByFilters(int page,
+                                                int size,
+                                                String sortField,
+                                                String sortDirection,
+                                                List<FilterCondition> filterConditions
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                sortDirection.equalsIgnoreCase("DESC")
+                        ? Sort.by(sortField).descending()
+                        : Sort.by(sortField).ascending()
+        );
+        return movieRepository.findAll(baseSpecification.buildSpecification(filterConditions),pageable);
+    }
+    @Deprecated
+    public Page<MovieIndex> findMoviesByFiltersElasticSearch(int page, int size, List<FilterCondition> filterConditions) {
         BoolQuery.Builder boolQueryBuilder = QueryBuilders.bool();
         for (FilterCondition filterCondition : filterConditions) {
             if(filterCondition.getMinValue()!=null){
@@ -107,27 +123,35 @@ public class MovieService {
                 boolQueryBuilder.must(matchQuery._toQuery());
             }
         }
-
         Pageable pageable = PageRequest.of(page, size);
         Query searchQuery = new NativeQueryBuilder()
                 .withQuery(boolQueryBuilder.build()._toQuery())
                 .withPageable(pageable)
                 .build();
-
-        log.error(searchQuery.toString());
-
-
         SearchHits<MovieIndex> searchHits = elasticsearchOperations.search(searchQuery, MovieIndex.class);
         return new PageImpl<>(searchHits.stream().map(SearchHit::getContent).collect(Collectors.toList()), pageable, searchHits.getTotalHits());
-
     }
 
+    public Page<MovieIndex> findSimilarMovies(int movieId,int page, int size) {
+        MovieIndex movie = movieIndexRepository.findById(movieId).orElseThrow(MovieNotFoundException::new);
+        return movieIndexRepository.findByOverviewAndGenreIds(
+                movie.getOverview(),
+                movie.getGenreIds(),
+                movieId,
+                PageRequest.of(page, size, Sort.by(Sort.Order.desc("tmdbPopularity")))
+        );
+    }
+    @Deprecated
     public void saveAllMovies(List<Movie> movieList) {
         List<MovieEntity> movieEntities = this.saveMovies(movieList);
         this.saveMoviesDocuments(movieList, movieEntities.stream().map(MovieEntity::getId).toList());
     }
 
-    private List<MovieEntity> saveMovies(List<Movie> movieList) {
+    public MovieEntity getMovieById(int movieId) {
+        return movieRepository.findById(movieId).orElseThrow(MovieNotFoundException::new);
+    }
+
+    public List<MovieEntity> saveMovies(List<Movie> movieList) {
         List<Integer> allGenreIds = movieList.stream()
                 .flatMap(movie -> movie.getGenreIds().stream())
                 .toList();

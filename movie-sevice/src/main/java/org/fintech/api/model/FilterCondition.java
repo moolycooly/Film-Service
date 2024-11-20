@@ -13,11 +13,13 @@ import java.util.List;
 @AllArgsConstructor
 public class FilterCondition {
     private String field;
+    private Object value;
     private Object minValue;
     private Object maxValue;
     private List<Object> mustBe;
     private List<Object> mustNot;
     private List<Object> should;
     private Object match;
+    private Boolean isLike;
 
 }

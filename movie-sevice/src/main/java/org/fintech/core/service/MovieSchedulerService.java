@@ -4,12 +4,10 @@ import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.core.Genre;
 import info.movito.themoviedbapi.model.core.Movie;
 import info.movito.themoviedbapi.model.core.MovieResultsPage;
-import info.movito.themoviedbapi.model.movies.MovieDb;
 import info.movito.themoviedbapi.tools.TmdbException;
 import info.movito.themoviedbapi.tools.builders.discover.DiscoverMovieParamBuilder;
 import lombok.RequiredArgsConstructor;
 import org.fintech.store.entity.GenreEntity;
-import org.fintech.store.entity.MovieEntity;
 import org.fintech.store.repository.GenreRepository;
 
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -54,7 +52,7 @@ public class MovieSchedulerService {
                 totalPages = movies.getTotalPages();
                 page++;
             }
-            movieService.saveAllMovies(movieResult);
+            movieService.saveMovies(movieResult);
 
         } catch (TmdbException e) {
             e.printStackTrace();
