@@ -1,181 +1,176 @@
 package org.fintech.core.service;
 
 
-import co.elastic.clients.elasticsearch._types.FieldValue;
-
-
-import co.elastic.clients.elasticsearch._types.query_dsl.*;
-import co.elastic.clients.json.JsonData;
-import info.movito.themoviedbapi.model.core.Movie;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.fintech.api.exception.MovieNotFoundException;
-import org.fintech.api.model.FilterCondition;
-import org.fintech.core.mapper.MovieMapper;
-import org.fintech.store.entity.GenreEntity;
-import org.fintech.store.entity.MovieIndex;
-import org.fintech.store.entity.MovieEntity;
-import org.fintech.store.repository.GenreRepository;
-import org.fintech.store.repository.MovieIndexRepository;
+import org.fintech.api.model.CreateMovieRequest;
+import org.fintech.api.model.MovieDto;
+import org.fintech.api.model.UpdateMovieRequest;
+import org.fintech.core.mapper.*;
+import org.fintech.core.model.Movie;
+import org.fintech.store.entity.*;
 import org.fintech.store.repository.MovieRepository;
-
-import org.fintech.store.specification.BaseSpecification;
-import org.springframework.data.domain.*;
-
-import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHit;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-
-
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MovieService {
 
-    private final MovieRepository movieRepository;
-
-    private final GenreRepository genreRepository;
-
-    private final MovieIndexRepository movieIndexRepository;
-
-    private final ElasticsearchOperations elasticsearchOperations;
-
-    private final BaseSpecification<MovieEntity> baseSpecification;
+    private final MongoTemplate mongoTemplate;
 
     private final MovieMapper movieMapper;
 
-    public Page<MovieEntity> findMoviesByFilters(int page,
-                                                int size,
-                                                String sortField,
-                                                String sortDirection,
-                                                List<FilterCondition> filterConditions
+    private final MovieRepository movieRepository;
+
+    private final GenreService genreService;
+
+    private final KeywordService keywordService;
+
+    private final CastService castService;
+
+    private final CrewService crewService;
+
+    private final GenreMapper genreMapper;
+
+    private final CrewMapper crewMapper;
+
+    private final CastMapper castMapper;
+
+    private final KeywordMapper keywordMapper;
+
+    public void create(CreateMovieRequest createMovieRequest) {
+        MovieEntity movieEntity = movieMapper.mapToEntity(createMovieRequest);
+
+        if (createMovieRequest.getGenres() != null) {
+            List<GenreEntity> genres = genreService.saveGenresByName(createMovieRequest.getGenres());
+            movieEntity.setGenres(genres);
+        }
+
+        if (createMovieRequest.getKeywords() != null) {
+            List<KeywordEntity> keywords = keywordService.saveKeywordsByName(createMovieRequest.getKeywords());
+            movieEntity.setKeywords(keywords);
+        }
+
+        if (createMovieRequest.getCast() != null) {
+            List<CastEntity> cast = createMovieRequest.getCast().stream().map(castMapper::mapToEntity).toList();
+            movieEntity.setCast(cast);
+        }
+
+        if (createMovieRequest.getCrews() != null) {
+            List<CrewEntity> crews = createMovieRequest.getCrews().stream().map(crewMapper::mapToEntity).toList();
+            movieEntity.setCrews(crews);
+        }
+
+        movieRepository.save(movieEntity);
+    }
+
+    public MovieDto getMovie(long id, List<String> fields) {
+
+        MovieEntity movieEntity = movieRepository.findById(id).orElseThrow(MovieNotFoundException::new);
+        MovieDto movieDto = movieMapper.mapToDto(movieEntity);
+
+        if (fields == null) {
+            return movieDto;
+        }
+
+        if (fields.contains("keyword")) {
+            movieDto.setKeywords(movieEntity.getKeywords().stream().map(keywordMapper::mapToDto).toList());
+        }
+        if (fields.contains("crew")) {
+            movieDto.setCrews(movieEntity.getCrews().stream().map(crewMapper::mapToDto).toList());
+        }
+        if(fields.contains("cast")) {
+            movieDto.setCast(movieEntity.getCast().stream().map(castMapper::mapToDto).toList());
+        }
+        return movieDto;
+    }
+
+    public void updateMovie(UpdateMovieRequest updateMovieRequest, long id) {
+        MovieEntity movieEntity = movieRepository.findById(id).orElseThrow(MovieNotFoundException::new);
+
+        if (updateMovieRequest.getAdult() != null)  movieEntity.setAdult(updateMovieRequest.getAdult());
+        if (updateMovieRequest.getBackdropPath() != null)  movieEntity.setBackdropPath(updateMovieRequest.getBackdropPath());
+        if (updateMovieRequest.getPosterPath() != null)  movieEntity.setPosterPath(updateMovieRequest.getPosterPath());
+        if (updateMovieRequest.getBudget() != null)  movieEntity.setBudget(updateMovieRequest.getBudget());
+        if (updateMovieRequest.getOverview() != null)  movieEntity.setOverview(updateMovieRequest.getOverview());
+        if (updateMovieRequest.getReleaseDate() != null)  movieEntity.setReleaseDate(updateMovieRequest.getReleaseDate());
+        if (updateMovieRequest.getRevenue() != null)  movieEntity.setRevenue(updateMovieRequest.getRevenue());
+        if (updateMovieRequest.getRuntime() != null)  movieEntity.setRuntime(updateMovieRequest.getRuntime());
+        if (updateMovieRequest.getStatus() != null)  movieEntity.setStatus(updateMovieRequest.getStatus());
+        if (updateMovieRequest.getTagline() != null)  movieEntity.setTagline(updateMovieRequest.getTagline());
+        if (updateMovieRequest.getTitle() != null)  movieEntity.setTitle(updateMovieRequest.getTitle());
+        if (updateMovieRequest.getOriginalTitle() != null)  movieEntity.setOriginalTitle(updateMovieRequest.getOriginalTitle());
+        if (updateMovieRequest.getOriginalLanguage() != null)  movieEntity.setOriginalLanguage(updateMovieRequest.getOriginalLanguage());
+        if (updateMovieRequest.getOriginCountry() != null)  movieEntity.setOriginCountry(updateMovieRequest.getOriginCountry());
+        if (updateMovieRequest.getTmdbVoteAverage() != null)  movieEntity.setTmdbId(updateMovieRequest.getBudget());
+
+        movieRepository.save(movieEntity);
+    }
+
+    public Page<MovieDto> searchMovies(
+            Boolean adult,
+            LocalDate releaseDateGte,
+            LocalDate releaseDateLte,
+            List<String> genresShould,
+            List<String> genresMust,
+            List<String> genresMustNot,
+            Pageable pageable
     ) {
-        Pageable pageable = PageRequest.of(
-                page,
-                size,
-                sortDirection.equalsIgnoreCase("DESC")
-                        ? Sort.by(sortField).descending()
-                        : Sort.by(sortField).ascending()
-        );
-        return movieRepository.findAll(baseSpecification.buildSpecification(filterConditions),pageable);
-    }
-    @Deprecated
-    public Page<MovieIndex> findMoviesByFiltersElasticSearch(int page, int size, List<FilterCondition> filterConditions) {
-        BoolQuery.Builder boolQueryBuilder = QueryBuilders.bool();
-        for (FilterCondition filterCondition : filterConditions) {
-            if(filterCondition.getMinValue()!=null){
-                var rangeBuilder = new RangeQuery.Builder().field(filterCondition.getField()).gte(JsonData.of(filterCondition.getMinValue()));
-                boolQueryBuilder.filter(rangeBuilder.build()._toQuery());
-            }
-            if(filterCondition.getMaxValue()!=null) {
-                var rangeBuilder = new RangeQuery.Builder().field(filterCondition.getField()).lte(JsonData.of(filterCondition.getMaxValue()));
-                boolQueryBuilder.filter(rangeBuilder.build()._toQuery());
-            }
 
-            if(filterCondition.getMustNot() != null) {
-                TermsQueryField countryTerms = new TermsQueryField.Builder()
-                        .value(filterCondition.getMustNot().stream().map(FieldValue::of).toList())
-                        .build();
-                boolQueryBuilder.mustNot(QueryBuilders.terms()
-                        .field(filterCondition.getField())
-                        .terms(countryTerms)
-                        .build()._toQuery()
-                );
-            }
-            if(filterCondition.getMustBe()!= null) {
-                TermsQueryField countryTerms = new TermsQueryField.Builder()
-                        .value(filterCondition.getMustBe().stream().map(FieldValue::of).toList())
-                        .build();
-                boolQueryBuilder.must(QueryBuilders.terms()
-                        .field(filterCondition.getField())
-                        .terms(countryTerms)
-                        .build()._toQuery()
-                );
-            }
-            if(filterCondition.getShould() != null) {
-                TermsQueryField countryTerms = new TermsQueryField.Builder()
-                        .value(filterCondition.getShould().stream().map(FieldValue::of).toList())
-                        .build();
-                boolQueryBuilder.should(QueryBuilders.terms()
-                        .field(filterCondition.getField())
-                        .terms(countryTerms)
-                        .build()._toQuery()
-                        )
-                .minimumShouldMatch("1");
-            }
-            if(filterCondition.getMatch() != null) {
-                MatchQuery matchQuery = new MatchQuery.Builder()
-                        .field(filterCondition.getField())
-                        .query(FieldValue.of(filterCondition.getMatch()))
-                        .analyzer("russian")
-                        .build();
-                boolQueryBuilder.must(matchQuery._toQuery());
-            }
-        }
-        Pageable pageable = PageRequest.of(page, size);
-        Query searchQuery = new NativeQueryBuilder()
-                .withQuery(boolQueryBuilder.build()._toQuery())
-                .withPageable(pageable)
-                .build();
-        SearchHits<MovieIndex> searchHits = elasticsearchOperations.search(searchQuery, MovieIndex.class);
-        return new PageImpl<>(searchHits.stream().map(SearchHit::getContent).collect(Collectors.toList()), pageable, searchHits.getTotalHits());
-    }
+        Criteria criteria = new Criteria();
 
-    public Page<MovieIndex> findSimilarMovies(int movieId,int page, int size) {
-        MovieIndex movie = movieIndexRepository.findById(movieId).orElseThrow(MovieNotFoundException::new);
-        return movieIndexRepository.findByOverviewAndGenreIds(
-                movie.getOverview(),
-                movie.getGenreIds(),
-                movieId,
-                PageRequest.of(page, size, Sort.by(Sort.Order.desc("tmdbPopularity")))
-        );
-    }
-    @Deprecated
-    public void saveAllMovies(List<Movie> movieList) {
-        List<MovieEntity> movieEntities = this.saveMovies(movieList);
-        this.saveMoviesDocuments(movieList, movieEntities.stream().map(MovieEntity::getId).toList());
-    }
+        if (adult != null) criteria.and("adult").is(adult);
+        if (genresShould != null && !genresShould.isEmpty()) criteria.and("genres").in(genreService.getGenresEntityByNames(genresShould));
+        if (genresMust!= null && !genresMust.isEmpty()) criteria.and("genres").all(genreService.getGenresEntityByNames(genresMust));
+        if (genresMustNot!= null && !genresMustNot.isEmpty()) criteria.and("genres").nin(genreService.getGenresEntityByNames(genresMustNot));
+        if (releaseDateGte != null) criteria.and("releaseDate").gte(releaseDateGte);
+        if (releaseDateLte != null) criteria.and("releaseDate").lte(releaseDateLte);
 
-    public MovieEntity getMovieById(int movieId) {
-        return movieRepository.findById(movieId).orElseThrow(MovieNotFoundException::new);
-    }
-
-    public List<MovieEntity> saveMovies(List<Movie> movieList) {
-        List<Integer> allGenreIds = movieList.stream()
-                .flatMap(movie -> movie.getGenreIds().stream())
+        Query query = new Query(criteria);
+        query.with(pageable);
+        List<MovieDto> movies = mongoTemplate.find(query, MovieEntity.class)
+                .stream()
+                .map(movieMapper::mapToDto)
                 .toList();
-        List<GenreEntity> genres = genreRepository.findByTmdbIdIn(allGenreIds);
-        List<MovieEntity> movieEntities = new ArrayList<>();
-        for (Movie movie : movieList) {
-            Set<GenreEntity> movieGenres = genres.stream()
-                    .filter(genre -> movie.getGenreIds().contains(genre.getTmdbId()))
-                    .collect(Collectors.toSet());
-            MovieEntity movieEntity = movieMapper.mapToEntity(movie);
-            movieEntity.setGenres(movieGenres);
-            movieEntities.add(movieEntity);
-        }
-       return movieRepository.saveAll(movieEntities);
+
+        long count = mongoTemplate.count(query, MovieEntity.class);
+
+        return new PageImpl<>(movies, pageable, count);
     }
 
-    private void saveMoviesDocuments(List<Movie> movieList, List<Integer> id) {
-        if(movieList.size() != id.size()) {
-            throw new IllegalArgumentException("Movie list size does not match id list size");
+    @Transactional
+    public void saveTmdbMovie(Movie movie){
+
+        if(movieRepository.findByTmdbId(movie.getId()).isPresent()) {
+            return;
         }
-        for(int i = 0; i < movieList.size(); i++) {
-            movieIndexRepository.save(movieMapper.mapToDocumet(movieList.get(i),id.get(i)));
-        }
+        MovieEntity movieEntity = movieMapper.mapToEntity(movie);
+
+        genreService.saveGenresEntity(movieEntity.getGenres());
+
+        keywordService.saveKeywordsEntity(movieEntity.getKeywords());
+
+        crewService.saveCrews(movieEntity.getCrews());
+
+        castService.saveCasts(movieEntity.getCast());
+
+        movieRepository.save(movieEntity);
     }
 
+    public void deleteMovie(long id) {
+        movieRepository.deleteById(id);
+    }
 }
 

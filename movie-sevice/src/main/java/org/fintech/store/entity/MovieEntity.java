@@ -1,77 +1,76 @@
 package org.fintech.store.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.List;
 
-@Builder
+@Document(collection = "movie")
 @Data
-@EqualsAndHashCode(exclude = "genres")
-@NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name="movie")
-public class MovieEntity {
+@NoArgsConstructor
+@Builder
+public class MovieEntity implements  SequenceAware {
+
+    @Transient
+    private final String sequenceName = "movie_sequence";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
-    @Column(name ="tmdb_id")
-    private Integer tmdbId;
+    private Long tmdbId;
 
-    @Column(name = "adult")
-    private Boolean adult;
-
-    @Column(name = "backdrop_path")
-    private String backdropPath;
-
-    @Column(name = "original_language")
-    private String originalLanguage;
-
-    @Column(name = "original_title")
-    private String originalTitle;
-
-    @Column(name = "overview")
-    private String overview;
-
-    @Column(name = "tmdb_popularity")
-    private Double tmdbPopularity;
-
-    @Column(name = "popularity")
-    private Double popularity;
-
-    @Column(name = "poster_path")
-    private String posterPath;
-
-    @Column(name = "release_date")
-    private String releaseDate;
-
-    @Column(name = "title")
     private String title;
 
-    @Column(name = "video")
+    private Boolean adult;
+
+    private Long budget;
+
+    private String backdropPath;
+
+    @DBRef
+    private List<GenreEntity> genres;
+
+    private List<String> originCountry;
+
+    private String originalLanguage;
+
+    private String originalTitle;
+
+    private String overview;
+
+    private String posterPath;
+
+    private LocalDate releaseDate;
+
+    private Long revenue;
+
+    private Integer runtime;
+
+    private String status;
+
+    private String tagline;
+
     private Boolean video;
 
-    @Column(name = "tmdb_vote_average")
     private Double tmdbVoteAverage;
 
-    @Column(name = "vote_average")
-    private Double voteAverage;
+    @DBRef(lazy = true)
+    private List<KeywordEntity> keywords;
 
-    @Column(name = "tmdb_vote_count")
-    private Integer tmdbVoteCount;
+    @DBRef(lazy = true)
+    private List<CastEntity> cast;
 
-    @Column(name = "vote_count")
-    private Integer voteCount;
+    @DBRef(lazy = true)
+    private List<CrewEntity> crews;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name="movie_genre",
-            joinColumns = @JoinColumn(name = "movie_id"),
-            inverseJoinColumns = @JoinColumn(name = "genre_id")
-    )
-    private Set<GenreEntity> genres;
+
 
 }

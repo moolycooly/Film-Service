@@ -1,73 +1,67 @@
 package org.fintech.core.service;
 
-import info.movito.themoviedbapi.TmdbApi;
-import info.movito.themoviedbapi.model.core.Genre;
-import info.movito.themoviedbapi.model.core.Movie;
-import info.movito.themoviedbapi.model.core.MovieResultsPage;
-import info.movito.themoviedbapi.tools.TmdbException;
-import info.movito.themoviedbapi.tools.builders.discover.DiscoverMovieParamBuilder;
 import lombok.RequiredArgsConstructor;
-import org.fintech.store.entity.GenreEntity;
-import org.fintech.store.repository.GenreRepository;
 
+import org.fintech.core.client.TmdbClient;
+import org.fintech.core.mapper.MovieMapper;
+import org.fintech.core.model.Movie;
+import org.fintech.store.entity.MovieEntity;
+import org.fintech.store.repository.MovieRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
 @EnableScheduling
 public class MovieSchedulerService {
 
+    private static final Logger log = LoggerFactory.getLogger(MovieSchedulerService.class);
     private final MovieService movieService;
 
-    private final GenreRepository genreRepository;
+    private final TmdbClient tmdbClient;
 
-    private final TmdbApi tmdbApi;
+    private final MovieMapper movieMapper;
+
+    private final MovieRepository movieRepository;
+
+    @Lazy
+    @Autowired
+    private MovieSchedulerService movieSchedulerService;
 
     @Scheduled(cron = "${scheduled.task.update-db}")
     public void loadNewMovies() {
-        event();
-        LocalDate today = LocalDate.now();
-        LocalDate yesterday = today.minusDays(1);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        try {
-            List<Movie> movieResult = new ArrayList<>();
-            int page = 1;
-            int totalPages = 1;
-            while (page <= totalPages){
-                MovieResultsPage movies = tmdbApi.getDiscover()
-                        .getMovie(new DiscoverMovieParamBuilder()
-                                .releaseDateGte(yesterday.format(formatter))
-                                .releaseDateLte(today.format(formatter))
-                                .language("ru")
-                                .page(page)
-                        );
-                movieResult.addAll(movies.getResults());
-                totalPages = movies.getTotalPages();
-                page++;
-            }
-            movieService.saveMovies(movieResult);
+        long id = movieRepository.findTopByOrderByTmdbIdDesc()
+                        .map(MovieEntity::getTmdbId)
+                        .orElse(1L);
 
-        } catch (TmdbException e) {
-            e.printStackTrace();
+        long latestId = tmdbClient.getLatestMovie().block().getId();
+
+        List<CompletableFuture<Movie>> futures = new ArrayList<>();
+
+        for (long currentId = id; currentId < latestId; currentId++) {
+            futures.add(movieSchedulerService.saveMovieAsync(currentId));
         }
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
-    public void event(){
-        try {
-            List<Genre> genres = tmdbApi.getGenre().getMovieList("ru");
-            for (Genre genre : genres) {
-                var entity = GenreEntity.builder().tmdbId(genre.getId()).name(genre.getName()).build();
-                genreRepository.save(entity);
-
-            }
-        }catch (TmdbException e){
-
-        }
+    @Async("customAsyncExecutor")
+    protected CompletableFuture<Movie> saveMovieAsync(long movieId) {
+        return Mono.fromCallable(() -> tmdbClient.getMovie(movieId).block())
+                .doOnSuccess(movie -> movieService.saveTmdbMovie(movie))
+                .doOnError(error -> log.error("Error saving movie with ID: " + movieId, error))
+                .toFuture();
     }
 }
+

@@ -1,17 +1,22 @@
 spring:
-  datasource:
-    username: postgres
-    password: postgres
-    url: jdbc:postgresql://localhost:5432/postgres
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true
+  application:
+    name: movie-service
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/movie-service
 integration:
   tmdb-api:
     url: https://api.themoviedb.org/3
+    url-image: https://image.tmdb.org/t/p/w500
     key: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxM2Y0MWUwNTdlNDg4MTljZjg3OWY3YzQ4YTNmYjQ1OSIsIm5iZiI6MTczMTg3MzMyOS43OTI4MjksInN1YiI6IjY2ZjgzMjA5NjIxZTg2MTZiNDVmM2VmYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.mlsLhOfl4X5E_JDn-Oy-OoyQcyEHMbC_zzbfr-QrWKs
+    retry:
+      max-attempts: 3
+      delay: 1000
+  s3:
+    endpoint: http://localhost:9000
+    access-key: user
+    secret-key: password
+    region: us-east-1
 scheduled:
   task:
     update-db: "0 0 3 * * ?"
