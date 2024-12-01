@@ -1,6 +1,7 @@
 package org.fintech.api.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,22 +14,17 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class MovieDto {
+public class CreateMovieRequest {
 
-    private Long id;
-
-    private Long tmdbId;
-
+    @NotBlank
     private String title;
 
+    @NotNull
     private Boolean adult;
 
     private Long budget;
 
     private String backdropPath;
-
-    private List<GenreDto> genres;
 
     private List<String> originCountry;
 
@@ -36,6 +32,7 @@ public class MovieDto {
 
     private String originalTitle;
 
+    @NotBlank
     private String overview;
 
     private String posterPath;
@@ -54,12 +51,13 @@ public class MovieDto {
 
     private Double tmdbVoteAverage;
 
-    private List<KeywordDto> keywords;
-
     private List<CastDto> cast;
 
     private List<CrewDto> crews;
 
+    private List<String> keywords;
+
+    private List<String> genres;
 
 
 }

@@ -1,10 +1,39 @@
-version: '3'
 services:
-  elasticsearch:
-    image: elasticsearch:8.16.0
+  mongodb-movie-service:
+    image: mongo:latest
+    container_name: mongodb-movie-service
     ports:
-      - 9200:9200
-      - 9300:9300
+      - "27017:27017"
+    volumes:
+      - ./mongodb-storage:/data/db
+    networks:
+      - movie-service
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_storage:/data
     environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
+      MINIO_ACCESS_KEY: user
+      MINIO_SECRET_KEY: password
+    command: server --console-address ":9001" /data
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 1;
+      /usr/bin/mc alias set myminio http://minio:9000 user password;
+      /usr/bin/mc mb myminio/movie;
+      /usr/bin/mc anonymous set public myminio/movie;
+      exit 0;
+      "
+networks:
+  movie-service:
+    driver: bridge
+volumes:
+  minio_storage: {}

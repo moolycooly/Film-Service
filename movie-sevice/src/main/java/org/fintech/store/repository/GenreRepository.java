@@ -1,14 +1,15 @@
 package org.fintech.store.repository;
 
 import org.fintech.store.entity.GenreEntity;
-import org.springframework.data.elasticsearch.annotations.Query;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface GenreRepository extends JpaRepository<GenreEntity, Integer> {
+public interface GenreRepository extends MongoRepository<GenreEntity, Long> {
 
-    List<GenreEntity> findByTmdbIdIn(List<Integer> tmdbIds);
+    Optional<GenreEntity> findByName(String name);
 
-    List<GenreEntity> findByIdIn(List<Integer> ids);
+    List<GenreEntity> findByNameIn(List<String> names);
+
 }
