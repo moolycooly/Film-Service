@@ -17,6 +17,7 @@ public final class ErrorCodeProperties {
             case NOT_ACCEPTABLE -> "Функция недоступна";
             case EMAIL_ALREADY_USED -> "Почта уже используется";
             case INVALID_ARGUMENT -> "Некорректные поля запроса";
+            case AUTHENTICATION_FAILED -> "Неверные данные";
         };
     }
 
@@ -27,6 +28,7 @@ public final class ErrorCodeProperties {
             case NOT_IMPLEMENTED -> HttpStatus.NOT_IMPLEMENTED;
             case NOT_FOUND -> HttpStatus.NOT_FOUND;
             case NOT_ACCEPTABLE -> HttpStatus.NOT_ACCEPTABLE;
+            case AUTHENTICATION_FAILED -> HttpStatus.UNAUTHORIZED;
             default -> HttpStatus.BAD_REQUEST;
         };
     }

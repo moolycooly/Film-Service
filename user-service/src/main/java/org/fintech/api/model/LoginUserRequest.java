@@ -1,7 +1,6 @@
 package org.fintech.api.model;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -13,15 +12,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateUserRequest {
+public class LoginUserRequest {
 
-    @NotNull
     @Size(min = 4, max = 50)
-    private String username;
-
-    @Email
     @NotNull
-    private String email;
+    private String username;
 
     @NotNull
     @Size(min = 4, max = 50)

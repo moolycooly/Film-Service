@@ -19,7 +19,9 @@ public enum ErrorCode {
 
     NOT_ACCEPTABLE(305),
 
-    NOT_IMPLEMENTED(306);
+    NOT_IMPLEMENTED(306),
+
+    AUTHENTICATION_FAILED(307);
 
     private final Integer code;
 }

@@ -1,11 +1,9 @@
 package org.fintech.api.error;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.fintech.core.exception.ErrorCode;
 import org.fintech.core.exception.ServiceException;
 
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +22,14 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(value = ServiceException.class)
     public ResponseEntity<ErrorMessage> handleServiceException(ServiceException ex) {
-        return new ResponseEntity<>(new ErrorMessage(ex.getMessage(), ErrorCodeProperties.getHttpStatus(ex.getErrorCode())).status());
+        return new ResponseEntity<>(
+                new ErrorMessage(ex.getMessage(),ex.getErrorCode().getCode()),
+                ErrorCodeProperties.getHttpStatus(ex.getErrorCode())
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ProblemDetail> methodArgumentNotValid(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorMessage> methodArgumentNotValid(MethodArgumentNotValidException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,"Invalid request");
 
         Map<String, String> errors = new HashMap<>();
@@ -40,8 +41,10 @@ public class ApiExceptionHandler {
         });
         problemDetail.setProperty("errors",errors);
 
-        return new ResponseEntity<>(problemDetail, HttpStatus.BAD_REQUEST);
-
+        return new ResponseEntity<>(
+                new ErrorMessage(errors.toString(), ErrorCode.INVALID_ARGUMENT.getCode()),
+                HttpStatus.BAD_REQUEST
+        );
     }
 
 }

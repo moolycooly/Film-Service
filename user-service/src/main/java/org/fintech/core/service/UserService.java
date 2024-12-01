@@ -1,8 +1,11 @@
 package org.fintech.core.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.fintech.api.model.CreateUserRequest;
+import org.fintech.api.model.LoginUserRequest;
 import org.fintech.api.model.UpdateUserRequest;
+import org.fintech.api.model.UserDto;
 import org.fintech.core.exception.ErrorCode;
 import org.fintech.core.exception.ServiceException;
 import org.fintech.core.mapper.UserMapper;
@@ -27,7 +30,7 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public void createUser(CreateUserRequest createUserRequest) {
+    public UserDto createUser(CreateUserRequest createUserRequest) {
         if (userRepository.existsByEmail(createUserRequest.getEmail())) {
             throw new IllegalArgumentException("Пользователь с таким email уже существует.");
         }
@@ -44,12 +47,12 @@ public class UserService {
         userEntity.setPassword(hashedPassword);
 
         ProfileEntity profileEntity = ProfileEntity.builder()
-                .firstName(createUserRequest.getFirstName())
-                .lastName(createUserRequest.getLastName())
                 .user(userEntity)
                 .build();
         userEntity.setProfile(profileEntity);
-        userRepository.save(userEntity);
+
+        UserEntity user = userRepository.save(userEntity);
+        return userMapper.toDto(user);
     }
 
     public void updateUser(long id, UpdateUserRequest updateUserRequest) {
@@ -68,12 +71,28 @@ public class UserService {
         userRepository.save(userEntity);
     }
 
+    public UserDto validateUser(LoginUserRequest loginUserRequest) {
+        UserEntity userEntity = userRepository.findByUsername(loginUserRequest.getUsername())
+                .orElseThrow(
+                        ()->new ServiceException(
+                                ErrorCode.NOT_FOUND,
+                                String.format("User with username \"%s\" not found", loginUserRequest.getUsername())
+                        )
+                );
+        if (validatePassword(userEntity, loginUserRequest.getPassword()))  {
+            return userMapper.toDto(userEntity);
+        }
+        throw new ServiceException(ErrorCode.AUTHENTICATION_FAILED, "Неверный пароль");
+    }
     private void checkExistsEmail(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new ServiceException(
                     ErrorCode.EMAIL_ALREADY_USED,String.format("User with email \"%s\" is already used", email)
             );
         }
+    }
+    private boolean validatePassword(UserEntity user, String password) {
+        return user.getPassword().equals(passwordEncoder.encode(password));
     }
 
 }
