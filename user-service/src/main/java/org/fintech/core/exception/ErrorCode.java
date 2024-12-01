@@ -21,7 +21,9 @@ public enum ErrorCode {
 
     NOT_IMPLEMENTED(306),
 
-    AUTHENTICATION_FAILED(307);
+    AUTHENTICATION_FAILED(307),
+
+    USERNAME_ALREADY_USED(308);
 
     private final Integer code;
 }

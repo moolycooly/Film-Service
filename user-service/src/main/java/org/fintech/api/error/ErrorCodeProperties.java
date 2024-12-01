@@ -16,8 +16,9 @@ public final class ErrorCodeProperties {
             case NOT_FOUND -> "Сущность не найдена";
             case NOT_ACCEPTABLE -> "Функция недоступна";
             case EMAIL_ALREADY_USED -> "Почта уже используется";
-            case INVALID_ARGUMENT -> "Некорректные поля запроса";
             case AUTHENTICATION_FAILED -> "Неверные данные";
+            case INVALID_ARGUMENT -> "Некорректные поля запроса";
+            case USERNAME_ALREADY_USED -> "Username уже используется";
         };
     }
 

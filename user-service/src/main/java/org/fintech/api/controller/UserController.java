@@ -4,13 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.fintech.api.ApiPaths;
 import org.fintech.api.model.CreateUserRequest;
 import org.fintech.api.model.LoginUserRequest;
 import org.fintech.api.model.UpdateUserRequest;
 import org.fintech.api.model.UserDto;
 import org.fintech.core.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,8 +23,8 @@ public class UserController {
 
     @Operation(summary = "Регистрация нового пользователя")
     @PostMapping(ApiPaths.USER)
-    public UserDto createUser(@RequestBody @Valid  CreateUserRequest createUserRequest) {
-        return userService.createUser(createUserRequest);
+    public ResponseEntity<UserDto> createUser(@RequestBody @Valid  CreateUserRequest createUserRequest) {
+        return new ResponseEntity<>(userService.createUser(createUserRequest),HttpStatus.CREATED);
     }
 
     @Operation(summary = "Авторизация пользователя")

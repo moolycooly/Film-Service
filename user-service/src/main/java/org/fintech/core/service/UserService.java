@@ -1,7 +1,6 @@
 package org.fintech.core.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.fintech.api.model.CreateUserRequest;
 import org.fintech.api.model.LoginUserRequest;
 import org.fintech.api.model.UpdateUserRequest;
@@ -32,10 +31,10 @@ public class UserService {
 
     public UserDto createUser(CreateUserRequest createUserRequest) {
         if (userRepository.existsByEmail(createUserRequest.getEmail())) {
-            throw new IllegalArgumentException("Пользователь с таким email уже существует.");
+            throw new ServiceException(ErrorCode.EMAIL_ALREADY_USED, "Пользователь с таким email уже существует.");
         }
         if (userRepository.existsByUsername(createUserRequest.getUsername())) {
-            throw new IllegalArgumentException("Пользователь с таким именем уже существует.");
+            throw new ServiceException(ErrorCode.USERNAME_ALREADY_USED, "Пользователь с таким именем уже существует.");
         }
         UserEntity userEntity = userMapper.toEntity(createUserRequest);
 
@@ -92,7 +91,7 @@ public class UserService {
         }
     }
     private boolean validatePassword(UserEntity user, String password) {
-        return user.getPassword().equals(passwordEncoder.encode(password));
+        return passwordEncoder.matches(password, user.getPassword());
     }
 
 }
