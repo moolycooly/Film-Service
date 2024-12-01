@@ -3,12 +3,9 @@ package org.fintech.core.service;
 import lombok.RequiredArgsConstructor;
 
 import org.fintech.core.client.TmdbClient;
-import org.fintech.core.mapper.MovieMapper;
 import org.fintech.core.model.Movie;
 import org.fintech.store.entity.MovieEntity;
 import org.fintech.store.repository.MovieRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
@@ -16,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +23,9 @@ import java.util.concurrent.CompletableFuture;
 @EnableScheduling
 public class MovieSchedulerService {
 
-    private static final Logger log = LoggerFactory.getLogger(MovieSchedulerService.class);
     private final MovieService movieService;
 
     private final TmdbClient tmdbClient;
-
-    private final MovieMapper movieMapper;
 
     private final MovieRepository movieRepository;
 
