@@ -55,10 +55,7 @@ public class UserService {
     }
 
     public void updateUser(long id, UpdateUserRequest updateUserRequest) {
-        UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(
-                        ()->new ServiceException(ErrorCode.NOT_FOUND,String.format("User with id \"%d\" not found", id))
-                );
+        UserEntity userEntity = findUserEntityById(id);
         if (updateUserRequest.getEmail() != null) {
             checkExistsEmail(updateUserRequest.getEmail());
             userEntity.setEmail(updateUserRequest.getEmail());
@@ -83,6 +80,7 @@ public class UserService {
         }
         throw new ServiceException(ErrorCode.AUTHENTICATION_FAILED, "Неверный пароль");
     }
+
     private void checkExistsEmail(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new ServiceException(
@@ -90,8 +88,16 @@ public class UserService {
             );
         }
     }
+
     private boolean validatePassword(UserEntity user, String password) {
         return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    private UserEntity findUserEntityById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(
+                        ()->new ServiceException(ErrorCode.NOT_FOUND,String.format("User with id \"%d\" not found", id))
+                );
     }
 
 }

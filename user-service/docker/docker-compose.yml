@@ -9,3 +9,37 @@ services:
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"
+  minio1:
+    image: minio/minio
+    ports:
+      - "9002:9002"
+      - "9003:9003"
+    volumes:
+      - minio_storage:/data
+    environment:
+      MINIO_ACCESS_KEY: user
+      MINIO_SECRET_KEY: password
+    command: server --console-address ":9003" /data
+    networks:
+      - minio1_network
+
+  createbuckets1:
+    image: minio/mc
+    depends_on:
+      - minio1
+    entrypoint: >
+      /bin/sh -c "
+      sleep 1;
+      /usr/bin/mc alias set myminio http://minio1:9002 user password;
+      /usr/bin/mc mb myminio/profile;
+      /usr/bin/mc anonymous set public myminio/profile;
+      exit 0;
+      "
+    networks:
+      - minio1_network
+volumes:
+  minio_storage: {}
+
+networks:
+  minio1_network:
+    driver: bridge

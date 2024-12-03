@@ -29,8 +29,8 @@ public class UserController {
 
     @Operation(summary = "Авторизация пользователя")
     @PostMapping(ApiPaths.USER_LOGIN)
-    public UserDto loginUser(@RequestBody @Valid LoginUserRequest loginUserRequest) {
-        return userService.validateUser(loginUserRequest);
+    public ResponseEntity<UserDto> loginUser(@RequestBody @Valid LoginUserRequest loginUserRequest) {
+        return ResponseEntity.ok().body(userService.validateUser(loginUserRequest));
     }
     @RequestMapping(value = ApiPaths.USER, method = {RequestMethod.PATCH,RequestMethod.PUT})
     public void updateUser(

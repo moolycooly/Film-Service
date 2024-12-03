@@ -1,0 +1,7 @@
+ALTER TABLE profile
+    ADD COLUMN gender VARCHAR(50),
+    ADD COLUMN birth_date DATE,
+    ADD COLUMN country VARCHAR(100),
+    ADD COLUMN city VARCHAR(100),
+    ADD COLUMN telegram VARCHAR(255),
+    ADD COLUMN about VARCHAR(500);

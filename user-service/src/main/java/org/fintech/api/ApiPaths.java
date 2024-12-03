@@ -10,4 +10,8 @@ public class ApiPaths {
 
     public static final String AUTHORITY_BY_ID = "/profile/{id}/authority";
 
+    public static final String PROFILE_BY_ID = "/profile/{id}";
+
+    public static final String PROFILE_BY_ID_PHOTO = "/profile/{id}/photo";
+
 }
