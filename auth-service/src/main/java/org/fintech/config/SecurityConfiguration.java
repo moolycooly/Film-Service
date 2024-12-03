@@ -18,14 +18,15 @@ public class SecurityConfiguration {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             ApiPaths.REGISTRATION,
-            ApiPaths.AUTHORIZATION
+            ApiPaths.AUTHORIZATION,
+            ApiPaths.TOKEN_VALIDATE
     };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(AUTH_WHITELIST).permitAll()
-                        .anyRequest().authenticated());
+                        .anyRequest().denyAll());
         return http.build();
     }
     @Bean

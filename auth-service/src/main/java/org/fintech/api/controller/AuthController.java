@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Аутентификация")
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 public class AuthController {
 
     private final AuthenticationService authenticationService;
@@ -25,7 +24,6 @@ public class AuthController {
     @Operation(summary = "Регистрация пользователя")
     @PostMapping(ApiPaths.REGISTRATION)
     public JwtAuthResponse signUp(@RequestBody @Valid RegistrationRequest registrationRequest) {
-        log.error("get");
         return authenticationService.signUp(registrationRequest);
     }
 

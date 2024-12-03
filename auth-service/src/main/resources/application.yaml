@@ -5,3 +5,6 @@ spring:
     name: auth-service
 server:
   port: 8442
+jwt:
+  secret: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE
+  expiration-time: P30D

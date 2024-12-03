@@ -1,15 +1,21 @@
 package org.fintech.core.service;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import org.fintech.api.model.JwtAuthResponse;
-import org.fintech.api.model.RegistrationRequest;
-import org.fintech.api.model.SignInRequest;
-import org.fintech.api.model.User;
+import lombok.extern.slf4j.Slf4j;
+import org.fintech.api.model.*;
 import org.fintech.core.client.UserServiceClient;
+import org.fintech.core.exception.ErrorCode;
+import org.fintech.core.exception.ServiceException;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationService {
 
     private final JwtService jwtService;
@@ -17,26 +23,21 @@ public class AuthenticationService {
     private final UserServiceClient userServiceClient;
 
     public JwtAuthResponse signUp(RegistrationRequest registrationRequest) {
-        try {
-            User user = userServiceClient.registerUser(registrationRequest);
-            String accessToken = jwtService.generate(user.getId(), user.getRoles(), "ACCESS");
-            String refreshToken = jwtService.generate(user.getId(), user.getRoles(), "REFRESH");
-            return new JwtAuthResponse(accessToken, refreshToken);
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred while signing up " + e.getLocalizedMessage());
-        }
-
+        User user = userServiceClient.registerUser(registrationRequest);
+        String accessToken = jwtService.createToken(user.getId(),Map.of("authorities",user.getRoles()));
+        return new JwtAuthResponse(accessToken);
     }
 
     public JwtAuthResponse signIn(SignInRequest request) {
-        try {
-            User user = userServiceClient.checkUser(request);
-            String accessToken = jwtService.generate(user.getId(), user.getRoles(), "ACCESS");
-            String refreshToken = jwtService.generate(user.getId(), user.getRoles(), "REFRESH");
-            return new JwtAuthResponse(accessToken, refreshToken);
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred while signing in " + e.getLocalizedMessage());
-        }
+        User user = userServiceClient.checkUser(request);
+        String accessToken = jwtService.createToken(user.getId(),Map.of("authorities",user.getRoles()));
+        return new JwtAuthResponse(accessToken);
+    }
+
+    public TokenValidationResponse getAuthorities(String token) {
+        long userId = jwtService.getUserId(token);
+        List<String> authorities = jwtService.extractAuthorities(token);
+        return new TokenValidationResponse(userId, authorities);
     }
 
 }

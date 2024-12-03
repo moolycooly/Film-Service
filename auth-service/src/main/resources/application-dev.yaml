@@ -1,4 +1,15 @@
-jwt:
-  secret: "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE"
-  expiration: 100000
-
+spring:
+  messages:
+    encoding: UTF-8
+    basename: messages
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+integration:
+  user-service:
+    name: user-service
+    max-attempts: 3
+    delay: 500
