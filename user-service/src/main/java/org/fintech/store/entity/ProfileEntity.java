@@ -46,7 +46,7 @@ public class ProfileEntity {
     @Column(name = "about", length = 1000)
     private String about;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", referencedColumnName  = "id")
     private UserEntity user;
 }

@@ -27,7 +27,7 @@ public class ProfilePhotoController {
     }
 
     @Operation(summary = "Получение фото профиля")
-    @DeleteMapping(value = ApiPaths.PROFILE_BY_ID_PHOTO)
+    @GetMapping(value = ApiPaths.PROFILE_BY_ID_PHOTO)
     public ResponseEntity<byte[]> getProfilePhoto(@PathVariable("id") long id) {
         return profilePhotoFacade.getProfilePhoto(id);
     }

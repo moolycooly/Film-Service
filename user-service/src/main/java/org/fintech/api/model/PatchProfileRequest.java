@@ -28,7 +28,4 @@ public class PatchProfileRequest {
 
     private String aboutMe;
 
-    @JsonIgnore
-    private String avatarId;
-
 }

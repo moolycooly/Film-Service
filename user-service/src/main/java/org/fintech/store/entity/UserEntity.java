@@ -3,6 +3,7 @@ package org.fintech.store.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "users")
+@DynamicInsert
 public class UserEntity {
 
     @Id
@@ -30,6 +32,9 @@ public class UserEntity {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "activate")
+    private Boolean activate = false;
 
     @CreationTimestamp
     @Column(updatable = false)

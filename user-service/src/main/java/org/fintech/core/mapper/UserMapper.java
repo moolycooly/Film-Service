@@ -16,6 +16,7 @@ public class UserMapper {
                 .email(userRequest.getEmail())
                 .username(userRequest.getUsername())
                 .roles(new HashSet<>())
+                .activate(false)
                 .build();
     }
 

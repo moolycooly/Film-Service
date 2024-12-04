@@ -1,7 +1,6 @@
 package org.fintech.api.facade;
 
 import lombok.RequiredArgsConstructor;
-import org.fintech.api.model.PatchProfileRequest;
 import org.fintech.api.model.ProfileDto;
 import org.fintech.core.exception.ErrorCode;
 import org.fintech.core.exception.ServiceException;
@@ -29,9 +28,7 @@ public class ProfilePhotoFacade {
     public void saveProfilePhoto(long userId, MultipartFile file) {
         try {
             String avatarId = fileStorageService.uploadFile(file, FileType.PROFILE_PHOTO);
-            PatchProfileRequest patchProfileRequest = new PatchProfileRequest();
-            patchProfileRequest.setAvatarId(avatarId);
-            profileService.patchProfile(userId, patchProfileRequest);
+            profileService.changeAvatar(userId, avatarId);
         } catch (IOException e) {
             throw new ServiceException(ErrorCode.INTERNAL_ERROR, "Не получилось загрузить фото в хранилище");
         }
@@ -45,8 +42,8 @@ public class ProfilePhotoFacade {
         MediaType mediaType;
         try{
             mediaType = MediaType.valueOf(Files.probeContentType(Path.of("." + parsedAvatarId[2])));
-            downloadedFile = fileStorageService.downloadFile(FileType.PROFILE_PHOTO.getBucketName(), parsedAvatarId[1]+parsedAvatarId[2]);
-        } catch (IOException e) {
+            downloadedFile = fileStorageService.downloadFile(FileType.PROFILE_PHOTO.getBucketName(), parsedAvatarId[1]+"."+parsedAvatarId[2]);
+        } catch (IOException | ArrayIndexOutOfBoundsException e) {
             throw new ServiceException(ErrorCode.INTERNAL_ERROR, "Не получилось получить фото");
         }
         return ResponseEntity.ok().contentType(mediaType).body(downloadedFile);

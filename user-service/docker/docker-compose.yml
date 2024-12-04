@@ -1,45 +1,37 @@
 version: '3.8'
 services:
-  postgres:
+  user-service-postgres:
     image: postgres:16
-    container_name: postgres16
+    container_name: user-service-postgres16
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"
-  minio1:
+  user-service-minio:
     image: minio/minio
     ports:
       - "9002:9002"
       - "9003:9003"
     volumes:
-      - minio_storage:/data
+      - minio_storage_user_service:/data
     environment:
       MINIO_ACCESS_KEY: user
       MINIO_SECRET_KEY: password
-    command: server --console-address ":9003" /data
-    networks:
-      - minio1_network
+    command: server --address ":9002" --console-address ":9003" /data
 
-  createbuckets1:
+  user-service-createbuckets:
     image: minio/mc
     depends_on:
-      - minio1
+      - user-service-minio
     entrypoint: >
       /bin/sh -c "
       sleep 1;
-      /usr/bin/mc alias set myminio http://minio1:9002 user password;
+      /usr/bin/mc alias set myminio http://user-service-minio:9002 user password;
       /usr/bin/mc mb myminio/profile;
       /usr/bin/mc anonymous set public myminio/profile;
       exit 0;
       "
-    networks:
-      - minio1_network
 volumes:
-  minio_storage: {}
-
-networks:
-  minio1_network:
-    driver: bridge
+  minio_storage_user_service: { }

@@ -11,8 +11,7 @@ CREATE TABLE profile (
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     avatar_id VARCHAR(255),
-    user_id BIGINT NOT NULL UNIQUE,
-    CONSTRAINT fk_profile_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    CONSTRAINT fk_profile_user FOREIGN KEY (id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE role (
