@@ -15,6 +15,7 @@ public final class ErrorCodeProperties {
             case INVALID_TOKEN -> "Неверный токен";
             case INVALID_ARGUMENT -> "Некорректные поля запроса";
             case AUTH_ERROR -> "Ошибка авторизации";
+            case NOT_FOUND -> "Сущность не найдена";
         };
     }
 

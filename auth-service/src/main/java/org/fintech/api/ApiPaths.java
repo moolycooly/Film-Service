@@ -9,6 +9,9 @@ public class ApiPaths {
 
     public static final String AUTHORIZATION = "/auth/sign-in";
 
+    public static final String ACTIVATE_ACCOUNT = "/auth/activate";
+
+
     public static final String TOKEN_VALIDATE = "/auth/token/validate";
 
     public static final String TOKEN_REFRESH = "/auth/token/refresh";

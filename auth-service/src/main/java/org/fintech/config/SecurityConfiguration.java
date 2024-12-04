@@ -19,7 +19,8 @@ public class SecurityConfiguration {
             "/v3/api-docs/**",
             ApiPaths.REGISTRATION,
             ApiPaths.AUTHORIZATION,
-            ApiPaths.TOKEN_VALIDATE
+            ApiPaths.TOKEN_VALIDATE,
+            ApiPaths.ACTIVATE_ACCOUNT
     };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

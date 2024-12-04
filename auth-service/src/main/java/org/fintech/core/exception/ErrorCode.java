@@ -15,7 +15,9 @@ public enum ErrorCode {
 
     INVALID_TOKEN(203),
 
-    INVALID_ARGUMENT(204);
+    INVALID_ARGUMENT(204),
+
+    NOT_FOUND(205);
 
     private final Integer code;
 }

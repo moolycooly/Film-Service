@@ -27,15 +27,17 @@ public class UserServiceClientConfiguration implements ErrorDecoder {
     public Exception decode(String s, Response response) {
         HttpStatus status = HttpStatus.valueOf(response.status());
         MicroserviceExceptionResponse reason;
-
         try{
             reason = this.parseResponseBody(response.body().toString());
         } catch (JsonProcessingException e) {
             reason = new MicroserviceExceptionResponse();
         }
 
-        if(status == HttpStatus.UNAUTHORIZED) {
+        if (status.equals(HttpStatus.UNAUTHORIZED)){
             return new ServiceException(ErrorCode.AUTH_ERROR, reason.getMessage());
+        }
+        if(status.equals(HttpStatus.NOT_FOUND)) {
+            return new ServiceException(ErrorCode.NOT_FOUND, reason.getMessage());
         }
         if (status.is4xxClientError()) {
             return new ServiceException(ErrorCode.INVALID_ARGUMENT, reason.getMessage());
