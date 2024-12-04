@@ -22,3 +22,5 @@ server:
 jwt:
   secret: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE
   expiration-time: P30D
+scheduler-timeout:
+  clear-old-coles: 0 0 * * * *
