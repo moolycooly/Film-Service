@@ -18,7 +18,6 @@ public class GenreService {
 
     private final GenreRepository genreRepository;
 
-    @Transactional
     public void saveGenre(GenreEntity genre) {
         Optional<GenreEntity> optionalGenreEntity = genreRepository.findByName(genre.getName());
         if (optionalGenreEntity.isPresent()) {
@@ -50,6 +49,7 @@ public class GenreService {
         return genreRepository.findByNameIn(names);
     }
 
+    @Transactional
     public void saveGenresEntity(List<GenreEntity> genres) {
         genres.forEach(this::saveGenre);
     }

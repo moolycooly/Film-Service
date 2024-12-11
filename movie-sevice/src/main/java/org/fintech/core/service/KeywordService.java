@@ -5,6 +5,7 @@ import org.fintech.store.entity.GenreEntity;
 import org.fintech.store.entity.KeywordEntity;
 import org.fintech.store.repository.KeywordRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Key;
 import java.util.List;
@@ -26,6 +27,7 @@ public class KeywordService {
         }
     }
 
+    @Transactional
     public void saveKeywordsEntity(List<KeywordEntity> keywords) {
         keywords.forEach(this::saveKeyword);
     }

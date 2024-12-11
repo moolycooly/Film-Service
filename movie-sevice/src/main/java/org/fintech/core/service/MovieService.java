@@ -3,10 +3,11 @@ package org.fintech.core.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.fintech.api.exception.MovieNotFoundException;
 import org.fintech.api.model.CreateMovieRequest;
 import org.fintech.api.model.MovieDto;
 import org.fintech.api.model.UpdateMovieRequest;
+import org.fintech.core.exception.ErrorCode;
+import org.fintech.core.exception.ServiceException;
 import org.fintech.core.mapper.*;
 import org.fintech.core.model.Movie;
 import org.fintech.store.entity.*;
@@ -42,8 +43,6 @@ public class MovieService {
 
     private final CrewService crewService;
 
-    private final GenreMapper genreMapper;
-
     private final CrewMapper crewMapper;
 
     private final CastMapper castMapper;
@@ -63,42 +62,32 @@ public class MovieService {
             movieEntity.setKeywords(keywords);
         }
 
-        if (createMovieRequest.getCast() != null) {
-            List<CastEntity> cast = createMovieRequest.getCast().stream().map(castMapper::mapToEntity).toList();
-            movieEntity.setCast(cast);
-        }
-
-        if (createMovieRequest.getCrews() != null) {
-            List<CrewEntity> crews = createMovieRequest.getCrews().stream().map(crewMapper::mapToEntity).toList();
-            movieEntity.setCrews(crews);
-        }
-
         movieRepository.save(movieEntity);
     }
 
     public MovieDto getMovie(long id, List<String> fields) {
 
-        MovieEntity movieEntity = movieRepository.findById(id).orElseThrow(MovieNotFoundException::new);
+        MovieEntity movieEntity = movieRepository.findById(id).orElseThrow(()->new ServiceException(ErrorCode.NOT_FOUND, "Фильм не найден"));
         MovieDto movieDto = movieMapper.mapToDto(movieEntity);
 
         if (fields == null) {
             return movieDto;
         }
 
-        if (fields.contains("keyword")) {
+        if (fields.contains("keywords")) {
             movieDto.setKeywords(movieEntity.getKeywords().stream().map(keywordMapper::mapToDto).toList());
         }
-        if (fields.contains("crew")) {
+        if (fields.contains("crews")) {
             movieDto.setCrews(movieEntity.getCrews().stream().map(crewMapper::mapToDto).toList());
         }
-        if(fields.contains("cast")) {
+        if(fields.contains("casts")) {
             movieDto.setCast(movieEntity.getCast().stream().map(castMapper::mapToDto).toList());
         }
         return movieDto;
     }
 
     public void updateMovie(UpdateMovieRequest updateMovieRequest, long id) {
-        MovieEntity movieEntity = movieRepository.findById(id).orElseThrow(MovieNotFoundException::new);
+        MovieEntity movieEntity = movieRepository.findById(id).orElseThrow(()->new ServiceException(ErrorCode.NOT_FOUND, "Фильм не найден"));
 
         if (updateMovieRequest.getAdult() != null)  movieEntity.setAdult(updateMovieRequest.getAdult());
         if (updateMovieRequest.getBackdropPath() != null)  movieEntity.setBackdropPath(updateMovieRequest.getBackdropPath());
@@ -137,6 +126,7 @@ public class MovieService {
         if (genresMustNot!= null && !genresMustNot.isEmpty()) criteria.and("genres").nin(genreService.getGenresEntityByNames(genresMustNot));
         if (releaseDateGte != null) criteria.and("releaseDate").gte(releaseDateGte);
         if (releaseDateLte != null) criteria.and("releaseDate").lte(releaseDateLte);
+
 
         Query query = new Query(criteria);
         query.with(pageable);

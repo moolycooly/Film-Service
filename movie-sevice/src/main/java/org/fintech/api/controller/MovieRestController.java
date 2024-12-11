@@ -8,7 +8,7 @@ import org.fintech.api.ApiPaths;
 import org.fintech.api.model.CreateMovieRequest;
 import org.fintech.api.model.MovieDto;
 import org.fintech.api.model.UpdateMovieRequest;
-import org.fintech.core.service.MovieSchedulerService;
+import org.fintech.core.scheduler.MovieSchedulerService;
 import org.fintech.core.service.MovieService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,16 +25,9 @@ public class MovieRestController {
 
     private final MovieService movieService;
 
-    private final MovieSchedulerService movieSchedulerService;
-
     @PostMapping(ApiPaths.MOVIE)
     public void createMovie(@RequestBody @Valid CreateMovieRequest createMovieRequest) {
         movieService.create(createMovieRequest);
-    }
-
-    @GetMapping
-    public void load() {
-        movieSchedulerService.loadNewMovies();
     }
 
     @GetMapping(ApiPaths.MOVIE_BY_ID)

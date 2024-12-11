@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.fintech.store.entity.CastEntity;
 import org.fintech.store.repository.CastRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,7 @@ public class CastService {
         }
     }
 
+    @Transactional
     public void saveCasts(List<CastEntity> cast) {
         cast.forEach(this::saveCast);
     }

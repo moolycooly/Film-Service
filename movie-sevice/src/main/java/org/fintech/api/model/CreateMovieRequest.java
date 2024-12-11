@@ -51,10 +51,6 @@ public class CreateMovieRequest {
 
     private Double tmdbVoteAverage;
 
-    private List<CastDto> cast;
-
-    private List<CrewDto> crews;
-
     private List<String> keywords;
 
     private List<String> genres;
