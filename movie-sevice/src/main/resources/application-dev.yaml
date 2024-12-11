@@ -17,6 +17,12 @@ integration:
     access-key: user
     secret-key: password
     region: us-east-1
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
 scheduled:
   task:
     update-db: "0 0 3 * * ?"
