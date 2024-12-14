@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.fintech.api.ApiPaths;
 import org.fintech.api.model.AuthValidationRequest;
 import org.fintech.api.model.TokenValidationResponse;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class TokenController {
 
     private final AuthenticationService authenticationService;

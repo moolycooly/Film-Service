@@ -22,7 +22,8 @@ public class ProfileController {
     }
 
     @RequestMapping(value = ApiPaths.PROFILE_BY_ID, method = {RequestMethod.PUT, RequestMethod.PATCH})
-    public void updateProfile(@PathVariable("id") long id, PatchProfileRequest profile) {
+    public void updateProfile(@PathVariable("id") long id, @RequestBody PatchProfileRequest profile) {
         profileService.patchProfile(id, profile);
     }
+
 }

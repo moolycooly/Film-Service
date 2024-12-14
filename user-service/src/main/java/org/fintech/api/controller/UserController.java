@@ -35,7 +35,7 @@ public class UserController {
         userService.activateUser(activateUserRequest);
     }
 
-    @RequestMapping(value = ApiPaths.USER, method = {RequestMethod.PATCH,RequestMethod.PUT})
+    @RequestMapping(value = ApiPaths.USER_BY_ID, method = {RequestMethod.PATCH,RequestMethod.PUT})
     public void updateUser(
             @PathVariable("id") long id,
             @Valid @RequestBody UpdateUserRequest updateUserRequest
