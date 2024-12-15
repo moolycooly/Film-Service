@@ -10,6 +10,7 @@ import org.fintech.api.model.JwtAuthResponse;
 import org.fintech.api.model.RegistrationRequest;
 import org.fintech.api.model.SignInRequest;
 import org.fintech.core.service.AuthenticationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,8 +25,10 @@ public class AuthController {
 
     @Operation(summary = "Регистрация пользователя с неактивированным аккаунтом, код отправляется на почту")
     @PostMapping(ApiPaths.REGISTRATION)
-    public void signUp(@RequestBody @Valid RegistrationRequest request) {
+    public ResponseEntity<String> signUp(@RequestBody @Valid RegistrationRequest request) {
         authenticationService.signUp(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Пользователь зарегистрирован, код подтверждения отправлен на почту");
     }
 
     @Operation(summary = "Авторизация пользователя по username")

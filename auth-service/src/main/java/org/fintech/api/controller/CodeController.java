@@ -1,6 +1,7 @@
 package org.fintech.api.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.fintech.api.ApiPaths;
@@ -8,6 +9,7 @@ import org.fintech.api.model.ActivateAccountRequest;
 import org.fintech.core.service.CodeService;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Коды")
 @RestController
 @RequiredArgsConstructor
 public class CodeController {

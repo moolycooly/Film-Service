@@ -15,8 +15,10 @@ public class ActivateAccountRequest {
 
     @Email
     @NotNull
+    @Schema(description = "Адрес электронной почты", example = "jondoe@gmail.com")
     private String email;
 
     @NotNull
+    @Schema(description = "6-значный код", example = "123456")
     private String code;
 }
