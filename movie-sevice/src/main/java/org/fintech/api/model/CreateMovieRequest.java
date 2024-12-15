@@ -49,8 +49,6 @@ public class CreateMovieRequest {
 
     private Boolean video;
 
-    private Double tmdbVoteAverage;
-
     private List<String> keywords;
 
     private List<String> genres;

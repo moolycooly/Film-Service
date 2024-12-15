@@ -40,7 +40,7 @@ public class ProfileByIdFilter implements GatewayFilter {
                 })
                 .onErrorResume(e -> {
                     log.error(e.getMessage());
-                    exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
+                    exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
                     return exchange.getResponse().setComplete();
                 });
     }

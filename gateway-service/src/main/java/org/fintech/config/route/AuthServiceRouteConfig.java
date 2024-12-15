@@ -11,7 +11,7 @@ public class AuthServiceRouteConfig {
     public static final String AUTH_SERVICE = "lb://auth-service";
 
     @Bean
-    public RouteLocator authServiceRoutes(RouteLocatorBuilder builder) {
+    public RouteLocator authServiceRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("auth-sign-up", r -> r.path("/auth/sign-up")
                         .uri(AUTH_SERVICE))
@@ -23,4 +23,5 @@ public class AuthServiceRouteConfig {
                         .uri(AUTH_SERVICE))
                 .build();
     }
+
 }

@@ -30,11 +30,13 @@ public class UserController {
         return ResponseEntity.ok().body(userService.validateUser(loginUserRequest));
     }
 
+    @Operation(summary = "Активация аккаунта пользователя")
     @PostMapping(ApiPaths.ACTIVATE_USER)
     public void activateUser(@RequestBody @Valid ActivateUserRequest activateUserRequest) {
         userService.activateUser(activateUserRequest);
     }
 
+    @Operation(summary = "Обновление данных о пользователе")
     @RequestMapping(value = ApiPaths.USER_BY_ID, method = {RequestMethod.PATCH,RequestMethod.PUT})
     public void updateUser(
             @PathVariable("id") long id,

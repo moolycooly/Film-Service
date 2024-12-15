@@ -103,7 +103,6 @@ public class MovieService {
         if (updateMovieRequest.getOriginalTitle() != null)  movieEntity.setOriginalTitle(updateMovieRequest.getOriginalTitle());
         if (updateMovieRequest.getOriginalLanguage() != null)  movieEntity.setOriginalLanguage(updateMovieRequest.getOriginalLanguage());
         if (updateMovieRequest.getOriginCountry() != null)  movieEntity.setOriginCountry(updateMovieRequest.getOriginCountry());
-        if (updateMovieRequest.getTmdbVoteAverage() != null)  movieEntity.setTmdbId(updateMovieRequest.getBudget());
 
         movieRepository.save(movieEntity);
     }

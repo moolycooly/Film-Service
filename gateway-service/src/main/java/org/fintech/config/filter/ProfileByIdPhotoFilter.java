@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
-public class UserByIdFilter  implements GatewayFilter {
+public class ProfileByIdPhotoFilter implements GatewayFilter {
 
     private final JwtService jwtService;
 
@@ -32,15 +32,16 @@ public class UserByIdFilter  implements GatewayFilter {
                         return exchange.getResponse().setComplete();
                     }
                     long userIdFromToken = tokenValidationResponse.getId();
-                    String originalPath = request.getURI().getPath();
-                    String newPath = originalPath.replaceFirst("/user", "/user/" + userIdFromToken);
-                    ServerHttpRequest modifiedRequest = request.mutate().path(newPath).build();
-                    return chain.filter(exchange.mutate().request(modifiedRequest).build());
+                    long id = exchange.getAttribute("id");
+                    if(id != userIdFromToken) {
+                        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                        return exchange.getResponse().setComplete();
+                    }
+                    return exchange.getResponse().setComplete();
                 })
                 .onErrorResume(e -> {
-                    exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+                    exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
                     return exchange.getResponse().setComplete();
                 });
     }
-
 }
