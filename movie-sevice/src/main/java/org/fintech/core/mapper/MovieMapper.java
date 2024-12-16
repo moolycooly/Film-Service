@@ -98,7 +98,6 @@ public class MovieMapper {
                 .originalLanguage(movie.getOriginalLanguage())
                 .originalTitle(movie.getOriginalTitle())
                 .overview(movie.getOverview())
-                .tmdbVoteAverage(movie.getTmdbVoteAverage())
                 .releaseDate(movie.getReleaseDate())
                 .tagline(movie.getTagline())
                 .status(movie.getStatus())

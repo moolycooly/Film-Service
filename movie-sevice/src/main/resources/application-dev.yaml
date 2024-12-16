@@ -1,9 +1,12 @@
 spring:
-  application:
-    name: movie-service
   data:
     mongodb:
       uri: mongodb://localhost:27017/movie-service
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
 integration:
   tmdb-api:
     url: https://api.themoviedb.org/3

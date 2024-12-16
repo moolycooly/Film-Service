@@ -6,8 +6,8 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class MovieApplication {
+public class MovieServiceApplication {
     public static void main(String[] args) {
-        SpringApplication.run(MovieApplication.class,args);
+        SpringApplication.run(MovieServiceApplication.class,args);
     }
 }

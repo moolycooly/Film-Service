@@ -21,3 +21,8 @@ integration:
     name: user-service
     max-attempts: 3
     delay: 500
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

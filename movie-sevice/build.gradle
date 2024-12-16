@@ -13,12 +13,14 @@ repositories {
 }
 
 dependencies {
+
     //starters
     implementation 'org.springframework.boot:spring-boot-starter-web'
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-validation:3.4.0'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     //retry
     implementation 'org.springframework.retry:spring-retry:2.0.10'
@@ -38,10 +40,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-
-
-
-
 }
 ext["springCloudVersion"] = "2023.0.3"
 
@@ -50,6 +48,7 @@ dependencyManagement {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
     }
 }
+
 test {
     useJUnitPlatform()
 }

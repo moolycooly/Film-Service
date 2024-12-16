@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'org.fintech'
-version = '1.0-SNAPSHOT'
+version = '0.0.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -16,6 +16,9 @@ dependencies {
 
     //cloud
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+
+    //actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     //test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
