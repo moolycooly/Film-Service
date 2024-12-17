@@ -5,8 +5,8 @@ spring:
     url: jdbc:postgresql://auth-service-postgres:5432/auth_db
     driver-class-name: org.postgresql.Driver
   mail:
-    username: filmygliko@gmail.com
-    password: erry rmnp wvik cbki
+    username: filmygliko535@gmail.com
+    password: fkhu hgdp edwy uihy
   messages:
     encoding: UTF-8
     basename: messages

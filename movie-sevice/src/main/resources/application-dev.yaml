@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/movie-service
+      uri: mongodb://movie-service-mongodb:27017/movie-service
 management:
   endpoints:
     web:
@@ -16,7 +16,7 @@ integration:
       max-attempts: 3
       delay: 1000
   s3:
-    endpoint: http://localhost:9000
+    endpoint: http://movie-service-minio:9000
     access-key: user
     secret-key: password
     region: us-east-1

@@ -21,7 +21,7 @@ management:
         include: health
 integration:
   s3:
-    endpoint: http://localhost:9002
+    endpoint: http://user-service-minio:9002
     access-key: user
     secret-key: password
     region: us-east-1
