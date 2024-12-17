@@ -10,4 +10,6 @@ public final class ApiPaths {
 
     public static final String MOVIE_IMAGE = "/movie/{id}/image";
 
+    public static final String MOVIE_LOAD_START = "/movie/load";
+
 }
