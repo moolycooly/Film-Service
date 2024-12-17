@@ -1,0 +1,203 @@
+services:
+  eureka-service:
+    build:
+      context: ./eureka-service
+      dockerfile: Dockerfile
+    container_name: eureka-service
+    ports:
+      - "8761:8761"
+    networks:
+      - film-service-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://eureka-service:8761/eureka/
+    ports:
+      - "8442:8442"
+    networks:
+      - film-service-network
+      - auth-service-network
+    depends_on:
+      - auth-service-postgres
+      - eureka-service
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8442/actuator/health" ]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://eureka-service:8761/eureka/
+    ports:
+      - "8449:8449"
+    networks:
+      - film-service-network
+      - user-service-network
+    depends_on:
+      - user-service-postgres
+      - eureka-service
+      - user-service-createbuckets
+      - user-service-minio
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8449/actuator/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+  movie-service:
+    build:
+      context: ./movie-sevice
+      dockerfile: Dockerfile
+    container_name: movie-service
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://eureka-service:8761/eureka/
+    ports:
+      - "8443:8443"
+    networks:
+      - film-service-network
+      - movie-service-network
+    depends_on:
+      - movie-service-mongodb
+      - eureka-service
+      - movie-service-minio
+      - movie-service-createbuckets
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8443/actuator/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    container_name: gateway-service
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://eureka-service:8761/eureka/
+    ports:
+      - "8000:8000"
+    networks:
+      - film-service-network
+    depends_on:
+      - auth-service
+      - movie-service
+      - user-service
+      - eureka-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/actuator/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+  user-service-postgres:
+    image: postgres:16
+    container_name: user-service-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=user_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./user-service/db-volume:/var/lib/postgresql/data
+    networks:
+      - user-service-network
+  movie-service-mongodb:
+    image: mongo:latest
+    container_name: movie-service-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./movie-service/mongodb-storage:/data/db
+    networks:
+      - movie-service-network
+  user-service-minio:
+    image: minio/minio
+    ports:
+      - "9002:9002"
+      - "9003:9003"
+    volumes:
+      - minio_storage_user_service:/data
+    environment:
+      MINIO_ACCESS_KEY: user
+      MINIO_SECRET_KEY: password
+    command: server --address ":9002" --console-address ":9003" /data
+    networks:
+      - user-service-network
+  user-service-createbuckets:
+    image: minio/mc
+    depends_on:
+      - user-service-minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 1;
+      /usr/bin/mc alias set myminio http://user-service-minio:9002 user password;
+      /usr/bin/mc mb myminio/profile;
+      /usr/bin/mc anonymous set public myminio/profile;
+      exit 0;
+      "
+    networks:
+      - user-service-network
+  movie-service-minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_storage_movie_service:/data
+    environment:
+      MINIO_ACCESS_KEY: user
+      MINIO_SECRET_KEY: password
+    command: server --address ":9000" --console-address ":9001" /data
+    networks:
+      - movie-service-network
+  movie-service-createbuckets:
+    image: minio/mc
+    depends_on:
+      - movie-service-minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 1;
+      /usr/bin/mc alias set myminio http://movie-service-minio:9000 user password;
+      /usr/bin/mc mb myminio/movie;
+      /usr/bin/mc anonymous set public myminio/movie;
+      exit 0;
+      "
+    networks:
+      - movie-service-network
+  auth-service-postgres:
+    image: postgres:16
+    container_name: auth-service-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./auth-service/db-volume:/var/lib/postgresql/data
+    networks:
+      - auth-service-network
+networks:
+  film-service-network:
+    driver: bridge
+  user-service-network:
+    driver: bridge
+  movie-service-network:
+    driver: bridge
+  auth-service-network:
+    driver: bridge
+  gateway-service-network:
+    driver: bridge
+volumes:
+  minio_storage_user_service: {}
+  minio_storage_movie_service: {}

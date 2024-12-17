@@ -1,4 +1,4 @@
 FROM openjdk:21
-ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} -service.jar
-ENTRYPOINT ["java","-jar","/auth-service.jar"]
+ARG JAR_FILE=build/libs/auth-service-0.0.1-SNAPSHOT.jar
+COPY ${JAR_FILE} auth-service.jar
+ENTRYPOINT ["java", "-jar", "/auth-service.jar"]

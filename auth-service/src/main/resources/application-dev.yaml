@@ -2,7 +2,7 @@ spring:
   datasource:
     username: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5433/postgres
+    url: jdbc:postgresql://auth-service-postgres:5432/auth_db
     driver-class-name: org.postgresql.Driver
   mail:
     username: filmygliko@gmail.com

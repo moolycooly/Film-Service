@@ -1,0 +1,83 @@
+task buildAll {
+    description = 'Build all services'
+    group = 'Build'
+
+    doLast {
+        def services = [
+                'movie-service',
+                'auth-service',
+                'user-service',
+                'eureka-service',
+                'gateway-service'
+        ]
+
+        services.each { service ->
+            println "Building $service..."
+            def serviceDir = new File(rootDir, service)
+
+            if (serviceDir.exists()) {
+                exec {
+                    commandLine './gradlew', 'build', '-p', serviceDir
+                }
+            } else {
+                println "Service $service not found, skipping..."
+            }
+        }
+    }
+}
+
+task cleanAll {
+    description = 'Clean all services'
+    group = 'Cleanup'
+
+    doLast {
+        def services = [
+                'movie-service',
+                'auth-service',
+                'user-service',
+                'eureka-service',
+                'gateway-service'
+        ]
+
+        services.each { service ->
+            println "Cleaning $service..."
+            def serviceDir = new File(rootDir, service)
+
+            if (serviceDir.exists()) {
+                exec {
+                    commandLine './gradlew', 'clean', '-p', serviceDir
+                }
+            } else {
+                println "Service $service not found, skipping..."
+            }
+        }
+    }
+}
+
+task testAll {
+    description = 'Run tests for all services'
+    group = 'Verification'
+
+    doLast {
+        def services = [
+                'movie-service',
+                'auth-service',
+                'user-service',
+                'eureka-service',
+                'gateway-service'
+        ]
+
+        services.each { service ->
+            println "Running tests for $service..."
+            def serviceDir = new File(rootDir, service)
+
+            if (serviceDir.exists()) {
+                exec {
+                    commandLine './gradlew', 'test', '-p', serviceDir
+                }
+            } else {
+                println "Service $service not found, skipping tests..."
+            }
+        }
+    }
+}
