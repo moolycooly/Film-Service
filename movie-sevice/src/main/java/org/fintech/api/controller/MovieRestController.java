@@ -10,10 +10,11 @@ import org.fintech.api.ApiPaths;
 import org.fintech.api.model.CreateMovieRequest;
 import org.fintech.api.model.MovieDto;
 import org.fintech.api.model.UpdateMovieRequest;
-import org.fintech.core.scheduler.MovieSchedulerService;
 import org.fintech.core.service.MovieService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -27,19 +28,22 @@ public class MovieRestController {
 
     private final MovieService movieService;
 
+    @Deprecated
     @Operation(summary = "Создать новый фильм", description = "Создаёт новый фильм на основе данных запроса")
     @PostMapping(ApiPaths.MOVIE)
-    public void createMovie(
+    public ResponseEntity<?> createMovie(
             @RequestBody @Valid @Parameter(description = "Данные для создания фильма") CreateMovieRequest createMovieRequest) {
         movieService.create(createMovieRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Фильм добавлен в базу");
     }
 
     @Operation(summary = "Получить информацию о фильме", description = "Возвращает данные фильма по указанному ID")
     @GetMapping(ApiPaths.MOVIE_BY_ID)
-    public MovieDto getMovie(
+    public ResponseEntity<MovieDto> getMovie(
             @PathVariable("id") long id,
             @RequestParam(value = "fields", required = false) List<String> fields) {
-        return movieService.getMovie(id, fields);
+        return ResponseEntity.ok(movieService.getMovie(id, fields));
     }
 
     @Operation(summary = "Поиск фильмов",
@@ -65,10 +69,11 @@ public class MovieRestController {
     @Operation(summary = "Обновить фильм",
             description = "Обновляет информацию о фильме по указанному ID")
     @RequestMapping(value = ApiPaths.MOVIE_BY_ID, method = {RequestMethod.PUT, RequestMethod.PATCH})
-    public void updateMovie(
+    public ResponseEntity<?> updateMovie(
             @Parameter(description = "ID фильма", example = "1") @PathVariable("id") long id,
             @RequestBody @Valid @Parameter(description = "Данные для обновления фильма") UpdateMovieRequest updateMovieRequest) {
         movieService.updateMovie(updateMovieRequest, id);
+        return ResponseEntity.ok("Данные о фильмы обновлены");
     }
 
     @Operation(summary = "Удалить фильм", description = "Удаляет фильм по указанному ID")

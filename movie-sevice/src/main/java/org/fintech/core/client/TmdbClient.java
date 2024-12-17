@@ -15,7 +15,6 @@ import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -43,7 +42,7 @@ public class TmdbClient {
                 .retrieve()
                 .bodyToMono(Movie.class)
                 .onErrorResume(WebClientResponseException.class,
-                        ex -> ex.getStatusCode().is4xxClientError() ? Mono.empty() : Mono.error(ex))
+                        ex -> ex.getStatusCode().equals(HttpStatus.NOT_FOUND) ? Mono.empty() : Mono.error(ex))
                 .retryWhen(Retry.backoff(baseMaxAttempts, Duration.ofMillis(baseRetryDelay)))
                 .doOnError(error-> {
                     log.error("Error to get movie from TMDB: {}", error.getMessage());

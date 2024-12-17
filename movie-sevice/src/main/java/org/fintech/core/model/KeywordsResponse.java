@@ -10,5 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class KeywordsResponse {
+
     private List<Keyword> keywords;
+
 }
